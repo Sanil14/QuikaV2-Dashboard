@@ -1,0 +1,122 @@
+[
+    {
+        "command": "q!invite",
+        "desc": "Get Quikas invite link to use or share"
+    },
+    {
+        "command": "q!hub",
+        "desc": "Get the invite link for the QuikaA3C home server"
+    },
+    {
+        "command": "q!stats",
+        "desc": "Shows the statistics of Quika"
+    },
+    {
+        "command": "q!mstats",
+        "desc": "Shows the music statistics of Quika"
+    },
+    {
+        "command": "q!serverinfo",
+        "desc": "Shows information about the Discord Server you are typed this command in"
+    },
+    {
+        "command": "q!userinfo",
+        "desc": "Shows you information about a specified user"
+    },
+    {
+        "command": "q!roleinfo",
+        "desc": "Shows you information about a specified role"
+    },
+    {
+        "command": "q!serverid",
+        "desc": "Shows you the unique ID of the server you typed this command in"
+    },
+    {
+        "command": "q!channelid",
+        "desc": "Shows you the unique ID of the channel you typed this command in"
+    },
+    {
+        "command": "q!myid",
+        "desc": "Shows you your unique Discord ID number"
+    },
+    {
+        "command": "q!say",
+        "desc": "Tell Quika to say anything"
+    },
+    {
+        "command": "q!esay",
+        "desc": "Tell Quika to say something in an invisible embed"
+    },
+    {
+        "command": "q!weather",
+        "desc": "Shows you weather information about a specified location"
+    },
+    {
+        "command": "q!view open-roles",
+        "desc": "Shows the available roles that are assignable"
+    },
+    {
+        "command": "q!view anti-swear",
+        "desc": "Shows information about the anti-swear. Giving information such as: words, channels ignoring, and toggle"
+    },
+    {
+        "command": "q!view quika_ids",
+        "desc": "Shows the users added into as Quika_ID"
+    },
+    {
+        "command": "q!view quika_roles",
+        "desc": "Shows information about custom quika_roles. Giving information such as: custom roles for each, and toggle"
+    },
+    {
+        "command": "q!roll",
+        "desc": "Guess what number you will get"
+    },
+    {
+        "command": "q!flip",
+        "desc": "Flips a coin"
+    },
+    {
+        "command": "q!decide",
+        "desc": "Shows Quika's decision"
+    },
+    {
+        "command": "q!google",
+        "desc": "Let's Quika google something for you"
+    },
+    {
+        "command": "q!random",
+        "desc": "Randomly chooses from options"
+    },
+    {
+        "command": "q!rename",
+        "desc": "Renames a channel name to your desired channel"
+    },
+    {
+        "command": "q!createchannel",
+        "desc": "Creates a text channel with either voice or text"
+    },
+    {
+        "command": "q!deletechannel",
+        "desc": "Deletes a text channel"
+    },
+    {
+        "command": "q!edittopic",
+        "desc": "Edits the channel topic of the specified text channel"
+    },
+    {
+        "command": "q!createrole",
+        "desc": "Creates a role with a color"
+    },
+    {
+        "command": "q!delrole",
+        "desc": "Deletes a role"
+    },
+    {
+        "command": "q!assign",
+        "desc": "Gives a specified user a role"
+    },
+    {
+        "command": "q!unassign",
+        "desc": "Removed a role from a specified user"
+    }
+]

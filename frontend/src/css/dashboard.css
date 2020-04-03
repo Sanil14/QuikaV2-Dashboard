@@ -1,0 +1,109 @@
+#dashboardHome {
+    width: 100%;
+    height: 100% !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+#dashboardHome .section-image {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 15px;
+    background: rgb(20, 20, 20);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#dashboardHome .section-image img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+#dashboardHome .section-image h5 {
+    padding-top: 10px;
+}
+
+#dashboardHome .modules {
+    -webkit-box-align: center;
+    flex-direction: column;
+    align-items: center;
+    align-items: center;
+    max-width: 700px;
+    margin: auto;
+  }
+  
+  #dashboardHome .module {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    height: 60px;
+    margin-bottom: 5px;
+  }
+  
+  #dashboardHome .module:hover {
+    border-radius: 20px;
+    background-color: #0e0e0e;
+  }
+  
+  #dashboardHome .section-body {
+    align-items: center;
+    background: rgb(20, 20, 20);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  
+  #dashboardHome .moduleName {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 15px;
+  }
+
+  #dashboardHome .moduleName i {
+    display: inline-block;
+    border-radius: 60px;
+    box-shadow: 0px 0px 2px #888;
+    padding: 0.5em 0.6em;
+    margin-right: 10px;
+  }
+  
+  #dashboardHome .moduleToggle {
+    margin-left: auto;
+    min-width: 80px;
+    white-space: nowrap;
+  }
+
+  #dashboardHome .moduleToggle .switch {
+    border-radius: 15px !important;
+  }
+  
+  #dashboardHome .dash-btn {
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    display: inline-block;
+    padding: 8px 10px 10px 10px;
+    border-radius: 3px;
+    transition: 0.5s;
+    color: #fff;
+    background: rgba(102, 182, 109, 0.56);
+    position: relative;
+    margin: 20px 0;
+    margin-right: 10px;
+  }
+  
+  #dashboardHome .dash-btn:hover {
+    background: #66b66d;
+  }
+  
+  #dashboardHome .dash-btn i {
+    font-size: 20px;
+    position: absolute;
+    left: 18px;
+    top: 8.5px;
+  }
+  
+  #dashboardHome .dash-btn + .dash-btn {
+    margin-left: 20px;
+  }
