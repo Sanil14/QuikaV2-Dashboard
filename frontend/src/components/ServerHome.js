@@ -169,12 +169,8 @@ class ServerHome extends Component {
   }
 
   async isAuthenticated() {
-    let data = await this.axiosinstance
-      .get("/auth/check")
-      .catch(async error => {
-        return await this.handleError(error);
-      });
-    return { data };
+    let { data } = await this.axiosinstance.get("/auth/check");
+    return data;
   }
 
   async getUserName() {
@@ -228,17 +224,6 @@ class ServerHome extends Component {
         return error;
       });
     return data;
-  }
-
-  async handleError(error) {
-    if (
-      error.response.status === 500 ||
-      error.response.statusText === "Internal Server Error"
-    ) {
-      Toast.fail("Server not responding. Please try again later.", 5000, () => {
-        return this.props.history.push("/");
-      });
-    }
   }
 }
 

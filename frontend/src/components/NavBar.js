@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Container } from 'react-bootstrap';
+import { Container } from "react-bootstrap";
 import axios from "axios";
+import Toast from "light-toast";
+import { withRouter } from "react-router-dom";
 
 class NavBar extends Component {
   constructor(props) {
@@ -17,7 +19,8 @@ class NavBar extends Component {
 
   async componentDidMount() {
     let auth = await this.isAuthenticated();
-    if (auth === true) {
+    if (!auth) return this.button = "";
+    if (auth.data) {
       let u = await this.getUserName();
       this.setState({ user: u });
       this.button = (
@@ -51,7 +54,11 @@ class NavBar extends Component {
               <Link className="dropdown-item db" to="/dashboard">
                 Dashboard
               </Link>
-              <Link to="#" className="dropdown-item logout" onClick={this.logt.bind(this)}>
+              <Link
+                to="#"
+                className="dropdown-item logout"
+                onClick={this.logt.bind(this)}
+              >
                 Logout
               </Link>
             </div>
@@ -105,6 +112,17 @@ class NavBar extends Component {
     );
   }
 
+  async handleError(error) {
+    if (
+      error.response.status === 500 ||
+      error.response.statusText === "Internal Server Error"
+    ) {
+      Toast.fail("Server not responding. Please try again later.", 5000, () => {
+        return this.props.history.push("/");
+      });
+    }
+  }
+
   oauthredirect = () => {
     window.location.href = "http://localhost:5000/login";
   };
@@ -118,7 +136,15 @@ class NavBar extends Component {
   }
 
   async isAuthenticated() {
-    let { data } = await this.axiosinstance.get("/auth/check");
+    let data = await this.axiosinstance
+      .get("/auth/check")
+      .catch(async error => {
+        if (window.location.pathname != "/") {
+          return await this.handleError(error);
+        } else {
+          this.connection = false;
+        }
+      });
     return data;
   }
 
@@ -128,4 +154,4 @@ class NavBar extends Component {
   }
 }
 
-export default NavBar;
+export default withRouter(NavBar);
