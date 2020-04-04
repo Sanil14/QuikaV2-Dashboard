@@ -159,12 +159,14 @@ class ServerHome extends Component {
   }
 
   async toggleButton(mod, checked) {
+    console.log(this.state);
     Toast.loading("Updating...");
     let res = await this.setModule(mod, this.state.guild.id, checked);
     if (res.status === 200) {
-      Toast.success("Settings Updated", 500);
+      Toast.success("Settings Updated", 150);
     } else {
-      Toast.fail("Try again later", 500);
+      Toast.fail("Server not responding. Please try again later.", 500);
+      this.props.history.push("/");
     }
   }
 
@@ -174,10 +176,10 @@ class ServerHome extends Component {
   }
 
   async getUserName() {
-    let data = await this.axiosinstance.get("/auth/user").catch(error => {
+    let { data } = await this.axiosinstance.get("/auth/user").catch(error => {
       return console.log(error);
     });
-    return { data };
+    return data;
   }
 
   async getGuilds() {
@@ -199,7 +201,7 @@ class ServerHome extends Component {
   }
 
   async getModules(gid) {
-    let data = await this.axiosinstance
+    let { data } = await this.axiosinstance
       .get("/auth/modules", {
         params: {
           id: gid
@@ -208,7 +210,7 @@ class ServerHome extends Component {
       .catch(error => {
         return console.log(error);
       });
-    return { data };
+    return data;
   }
 
   async setModule(module, gid, checked) {

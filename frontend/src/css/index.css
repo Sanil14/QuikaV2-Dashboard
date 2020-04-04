@@ -912,6 +912,9 @@ section {
   color: rgb(212, 37, 37);
 }
 
+.loggedinbutton .dropdown .invite {
+  border-top: solid 1px rgb(143, 143, 143);
+}
 
 #dashboard {
   width: 100%;
@@ -1092,7 +1095,7 @@ Animation for DROPDOWN
     opacity: 0;
   }
   100% {
-    transform:translateY(0rem);
+    transform: translateY(0rem);
     opacity: 1;
   }
   0% {

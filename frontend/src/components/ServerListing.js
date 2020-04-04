@@ -3,13 +3,13 @@ import axios from "axios";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import NavBar from "./NavBar";
 import { NavLink } from "react-router-dom";
-import { Container } from 'react-bootstrap';
+import { Container } from "react-bootstrap";
 
 class ServerListing extends Component {
   constructor() {
     super();
     this.axios = "";
-    this.state = { user: [], guild: [] };
+    this.state = { user: [], guild: [], hasList: true };
   }
 
   async componentDidMount() {
@@ -33,7 +33,12 @@ class ServerListing extends Component {
           guilds.push([g[i].id, g[i].name, g[i].icon, setg]);
         }
       }
-      this.setState({ user: users, guild: guilds });
+      console.log(g)
+      if (guilds.length < 1) {
+        this.setState({ user: users, guild: guilds, hasList: false });
+      } else {
+        this.setState({ user: users, guild: guilds, hasList: true });
+      }
     } else {
       return (window.location.href = "/");
     }
@@ -57,15 +62,22 @@ class ServerListing extends Component {
                 <div className="guilds">
                   {this.state.guild.length > 0 ? (
                     this.state.guild.map((g, i) => (
-                      <NavLink to={g[3] ? `/dashboard/${g[0]}` : `/invite?${g[0]}`} key={i} >
+                      <NavLink
+                        to={g[3] ? `/dashboard/${g[0]}` : `/invite?${g[0]}`}
+                        key={i}
+                      >
                         <div className="guild">
                           <div
                             style={{
-                              backgroundImage: `url(${g[2] != null ? "https://cdn.discordapp.com/icons/" +
-                                g[0] +
-                                "/" +
-                                g[2] +
-                                ".png" : "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png"})`
+                              backgroundImage: `url(${
+                                g[2] != null
+                                  ? "https://cdn.discordapp.com/icons/" +
+                                    g[0] +
+                                    "/" +
+                                    g[2] +
+                                    ".png"
+                                  : "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png"
+                              })`
                             }}
                             className="guildIcon"
                           ></div>
@@ -80,7 +92,7 @@ class ServerListing extends Component {
                         </div>
                       </NavLink>
                     ))
-                  ) : (
+                  ) : this.state.hasList ? (
                     <div className="guild" href="#">
                       <div className="guildIcon">
                         <Skeleton circle={true} width={45} height={45} />
@@ -92,7 +104,15 @@ class ServerListing extends Component {
                         <Skeleton height={35} width={125} />
                       </div>
                     </div>
+                  ) : (
+                    <div
+                      className="noServers" style={{textAlign: "center"}}>
+                      <h6>No servers were found :(</h6>
+                    </div>
                   )}
+                </div>
+                <div className="helpertext" style={{textAlign: "center", fontSize: "14px", color: "#b0bac2"}}>
+                  Did not find the server you were looking for? Relog to update server list
                 </div>
               </div>
             </Container>

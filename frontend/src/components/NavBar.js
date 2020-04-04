@@ -57,9 +57,11 @@ class NavBar extends Component {
               <Link
                 to="#"
                 className="dropdown-item logout"
-                onClick={this.logt.bind(this)}
-              >
+                onClick={this.logt.bind(this)}>
                 Logout
+              </Link>
+              <Link to="/invite" className="dropdown-item invite">
+                Invite Bot
               </Link>
             </div>
           </div>
@@ -139,7 +141,7 @@ class NavBar extends Component {
     let data = await this.axiosinstance
       .get("/auth/check")
       .catch(async error => {
-        if (window.location.pathname != "/") {
+        if (window.location.pathname !== "/") {
           return await this.handleError(error);
         } else {
           this.connection = false;
