@@ -1,24 +1,23 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import NavBar from "./NavBar";
 import axios from "axios";
 import { Container } from "react-bootstrap";
 import "../css/dashboard.css";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
-import Toast from "light-toast";
+import ServerModules from "./ServerModules";
+import ServerGeneral from "./ServerGeneral";
 
 class ServerHome extends Component {
   constructor(props) {
     super(props);
     this.guildid = this.props.match.params.guildId;
     this.axiosinstance = "";
-    this.state = { user: [], guild: {}, module: {} };
+    this.state = { user: [], guild: {}, module: {}, page: "modules" };
   }
 
   async componentDidMount() {
     this.axiosinstance = axios.create({
-      baseURL: "/"
+      baseURL: "/",
     });
     let auth = await this.isAuthenticated();
     if (auth) {
@@ -54,6 +53,7 @@ class ServerHome extends Component {
       }
       let modules = await this.getModules(guilds.id);
       this.setState({ user: users, guild: guilds, module: modules });
+      console.log(this.state);
     } else {
       return this.props.history.push("/");
     }
@@ -71,85 +71,32 @@ class ServerHome extends Component {
             <Container>
               <div className="section-image section-title">
                 <img
-                  src={`${"https://cdn.discordapp.com/icons/" +
+                  src={`${
+                    "https://cdn.discordapp.com/icons/" +
                     this.state.guild.id +
                     "/" +
                     this.state.guild.icon +
-                    ".png"}`}
+                    ".png"
+                  }`}
+                  alt="Server Icon"
                 />
                 <h5>{this.state.guild.name}</h5>
               </div>
               <div className="section-body">
-                <div className="modules">
-                  {/* Use ServerListing row code for listing modules
-                    That module will dynamically change only the contents 
-                    from below the servername and will show relevant data.
-                 */}
-                  {
-                    <div>
-                      <div className="module">
-                        <NavLink to={true ? `/dashboard/` : `/invite?`}>
-                          <div className="moduleName">
-                            <i className="bx bx-detail"></i>
-                            <span>General</span>
-                          </div>
-                        </NavLink>
-                        <div className="moduleToggle">
-                          <BootstrapSwitchButton
-                            checked={this.state.module.Generic}
-                            onstyle="success"
-                            onlabel="ON"
-                            offstyle="dark"
-                            offlabel="OFF"
-                            onChange={async checked => {
-                              await this.toggleButton("generic", checked);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="module">
-                        <NavLink to={true ? `/dashboard/` : `/invite?`}>
-                          <div className="moduleName">
-                            <i className="bx bx-wrench"></i>
-                            <span>Moderation</span>
-                          </div>
-                        </NavLink>
-                        <div className="moduleToggle">
-                          <BootstrapSwitchButton
-                            checked={this.state.module.Mod}
-                            onstyle="success"
-                            onlabel="ON"
-                            offstyle="dark"
-                            offlabel="OFF"
-                            onChange={async checked => {
-                              await this.toggleButton("mod", checked);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="module">
-                        <NavLink to={true ? `/dashboard/` : `/invite?`}>
-                          <div className="moduleName">
-                            <i className="bx bx-music"></i>
-                            <span>Music</span>
-                          </div>
-                        </NavLink>
-                        <div className="moduleToggle">
-                          <BootstrapSwitchButton
-                            checked={this.state.module.Music}
-                            onstyle="success"
-                            onlabel="ON"
-                            offstyle="dark"
-                            offlabel="OFF"
-                            onChange={async checked => {
-                              await this.toggleButton("music", checked);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
+                {this.state.page === "modules" ? (
+                  <ServerModules
+                    state={this.state}
+                    changePage={this.changePage}
+                    moduleset={this.setModule}
+                  />
+                ) : this.state.page === "general" ? (
+                  <ServerGeneral
+                    state={this.state}
+                    changePage={this.changePage}
+                  />
+                ) : (
+                  "WotDahlell"
+                )}
               </div>
             </Container>
           </section>
@@ -158,17 +105,12 @@ class ServerHome extends Component {
     );
   }
 
-  async toggleButton(mod, checked) {
-    console.log(this.state);
-    Toast.loading("Updating...");
-    let res = await this.setModule(mod, this.state.guild.id, checked);
-    if (res.status === 200) {
-      Toast.success("Settings Updated", 150);
-    } else {
-      Toast.fail("Server not responding. Please try again later.", 500);
-      this.props.history.push("/");
-    }
-  }
+  changePage = (page) => {
+    //var state = { ...this.state };
+    //state.page = page;
+    //console.log(state);
+    this.setState({ page: page });
+  };
 
   async isAuthenticated() {
     let { data } = await this.axiosinstance.get("/auth/check");
@@ -176,7 +118,7 @@ class ServerHome extends Component {
   }
 
   async getUserName() {
-    let { data } = await this.axiosinstance.get("/auth/user").catch(error => {
+    let { data } = await this.axiosinstance.get("/auth/user").catch((error) => {
       return console.log(error);
     });
     return data;
@@ -191,10 +133,10 @@ class ServerHome extends Component {
     let { data } = await this.axiosinstance
       .get("/auth/guildissetup", {
         params: {
-          id: gid
-        }
+          id: gid,
+        },
       })
-      .catch(error => {
+      .catch((error) => {
         return console.log(error);
       });
     return data;
@@ -204,29 +146,29 @@ class ServerHome extends Component {
     let { data } = await this.axiosinstance
       .get("/auth/modules", {
         params: {
-          id: gid
-        }
+          id: gid,
+        },
       })
-      .catch(error => {
+      .catch((error) => {
         return console.log(error);
       });
     return data;
   }
 
-  async setModule(module, gid, checked) {
+  setModule = async (module, gid, checked) => {
     let data = await this.axiosinstance
       .get("/auth/setmodule", {
         params: {
           mod: module,
           gid: gid,
-          add: checked
-        }
+          add: checked,
+        },
       })
-      .catch(error => {
+      .catch((error) => {
         return error;
       });
     return data;
-  }
+  };
 }
 
 export default ServerHome;
