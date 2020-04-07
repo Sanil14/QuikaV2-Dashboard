@@ -3,6 +3,7 @@
         "host": "localhost",
         "username": "root",
         "password": "",
-        "database": "quikav2"
+        "database": "quikav2",
+        "bottoken": "MzAzNTMzMzIzMjU3NjQzMDIw.XooKvA.UV3OXrtF3JYIyXi4301XaMnlUW0"
     }
 }

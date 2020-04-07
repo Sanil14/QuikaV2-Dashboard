@@ -6,15 +6,26 @@ const express = require("express"),
   MySQLStore = require("connect-mysql")(session),
   { Strategy } = require("passport-discord"),
   cors = require("cors"),
-  app = express();
+  app = express(),
+  fetch = require("node-fetch"),
+  Discord = require("discord.js"),
+  quika = new Discord.Client();
+
+// DISCORD BOT LOGIN AND CONFIG
+quika.on("ready", () => {
+  console.log("Discord Bot Initialized");
+});
+quika.login(conf.config.bottoken);
+
+// Express and OAUTH
 
 var connection = mysql.createConnection({
   host: conf.config.host,
   user: conf.config.username,
   password: conf.config.password,
-  database: conf.config.database
+  database: conf.config.database,
 });
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) {
     return console.log(err);
   } else {
@@ -22,11 +33,11 @@ connection.connect(function(err) {
   }
 });
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
@@ -38,10 +49,10 @@ passport.use(
       clientID: "303533323257643020",
       clientSecret: "ChD4WBE8cvkyAs841mKjpjZwiOfUqP1x",
       callbackURL: "http://localhost:5000/discord-callback",
-      scope: scopes
+      scope: scopes,
     },
-    function(accessToken, refreshToken, profile, done) {
-      process.nextTick(function() {
+    function (accessToken, refreshToken, profile, done) {
+      process.nextTick(function () {
         return done(null, profile);
       });
     }
@@ -53,7 +64,7 @@ app.use(
     secret: "woahthisissickwhatdoIputhere ?!?!?",
     store: new MySQLStore(conf),
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
   })
 );
 app.use(passport.initialize());
@@ -63,41 +74,41 @@ app.get(
   "/login",
   cors(),
   passport.authenticate("discord", { scope: scopes }),
-  function(req, res) {}
+  function (req, res) {}
 );
 
 app.get(
   "/discord-callback",
   cors(),
   passport.authenticate("discord", { failureRedirect: "/" }),
-  function(req, res) {
+  function (req, res) {
     res.redirect("http://localhost:3000/dashboard");
   }
 );
 
-app.get("/auth/check", function(req, res) {
+app.get("/auth/check", function (req, res) {
   res.send(req.isAuthenticated());
 });
 
-app.get("/auth/logout", function(req, res) {
+app.get("/auth/logout", function (req, res) {
   req.logout();
   res.send("User Logged Out!");
 });
 
-app.get("/auth/user", checkAuth, function(req, res) {
+app.get("/auth/user", checkAuth, function (req, res) {
   res.send([req.user.username, req.user.id, req.user.avatar]);
 });
 
-app.get("/auth/guilds", checkAuth, function(req, res) {
+app.get("/auth/guilds", checkAuth, function (req, res) {
   res.json(req.user.guilds);
 });
 
-app.get("/auth/guildissetup", function(req, res) {
+app.get("/auth/guildissetup", function (req, res) {
   if (!req.query.id || req.query.id.length != 18) {
     return res.status(401).send({ error: "No query found!" });
   }
   let gid = req.query.id;
-  connection.query("SELECT * FROM `servers` WHERE `ID`=" + gid, function(
+  connection.query("SELECT * FROM `servers` WHERE `ID`=" + gid, function (
     err,
     row
   ) {
@@ -114,7 +125,7 @@ app.get("/auth/guildissetup", function(req, res) {
   });
 });
 
-app.get("/auth/modules", function(req, res) {
+app.get("/auth/modules", checkAuth, function (req, res) {
   if (!req.query.id || req.query.id.length != 18) {
     return res.status(401).send({ error: "No query found" });
   }
@@ -124,7 +135,7 @@ app.get("/auth/modules", function(req, res) {
     resp = {};
   connection.query(
     "SELECT activeModules FROM `servers` WHERE `ID`=" + gid,
-    function(err, row) {
+    function (err, row) {
       if (err) {
         res.send({ error: "MySql Query Error:" });
         return console.log(err);
@@ -133,7 +144,7 @@ app.get("/auth/modules", function(req, res) {
           res.send({ error: "No Guild Found" });
         } else {
           active = row[0].activeModules.split(", ");
-          connection.query("SELECT modules FROM `quika_data`", function(
+          connection.query("SELECT modules FROM `quika_data`", function (
             err,
             row
           ) {
@@ -165,12 +176,8 @@ app.get("/auth/modules", function(req, res) {
   );
 });
 
-app.get("/auth/setmodule", function(req, res) {
-  if (
-    !req.query.mod ||
-    !req.query.gid ||
-    req.query.gid.length != 18
-  ) {
+app.get("/auth/setmodule", checkAuth, function (req, res) {
+  if (!req.query.mod || !req.query.gid || req.query.gid.length != 18) {
     return res.sendStatus(404);
   }
   let module = req.query.mod,
@@ -178,7 +185,7 @@ app.get("/auth/setmodule", function(req, res) {
     add = JSON.parse(req.query.add);
   connection.query(
     "SELECT activeModules FROM `servers` WHERE `ID`=" + gid,
-    function(err, row) {
+    function (err, row) {
       if (err) {
         res.sendStatus(404);
         return console.log(err);
@@ -201,7 +208,7 @@ app.get("/auth/setmodule", function(req, res) {
               modules +
               "' WHERE `ID`=" +
               gid,
-            function(err, row) {
+            function (err, row) {
               if (err) {
                 res.sendStatus(404);
                 return console.log(err);
@@ -216,11 +223,162 @@ app.get("/auth/setmodule", function(req, res) {
   );
 });
 
-app.get("/test", cors(), function(req, res) {
+app.get("/auth/getoverride", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) {
+    return res.status(401).send({ error: "No query found" });
+  }
+  let { gid } = req.query;
+  connection.query(
+    "SELECT adminOverride FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySQL Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          res.send({ error: "No Guild Found" });
+        } else {
+          let toggle = row[0].adminOverride;
+          res.json(toggle);
+        }
+      }
+    }
+  );
+});
+
+app.get("/auth/setoverride", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) return res.sendStatus(404);
+  let { gid } = req.query,
+    toggle = JSON.parse(req.query.toggle);
+  connection.query(
+    "UPDATE `servers` SET `adminOverride`=" + toggle + " WHERE `ID`=" + gid,
+    async function (err, row) {
+      if (err) {
+        res.sendStatus(404);
+        return console.log(err);
+      } else {
+        res.sendStatus(200);
+      }
+    }
+  );
+});
+
+app.get("/auth/getgroles", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) return res.sendStatus(404);
+  let gid = req.query.gid;
+  if (!quika.guilds.cache.some((u) => u.id === gid)) return res.sendStatus(404);
+  let roles = [];
+  quika.guilds.cache.get(gid).roles.cache.map((r, i) => {
+    if (r.managed) return;
+    roles.push({
+      name: r.name,
+      rawPosition: r.rawPosition,
+      color: r.color,
+      id: i,
+    });
+  });
+  res.json(roles);
+});
+
+app.get("/auth/getnodes", checkAuth, function (req, res) {
+  connection.query("SELECT perm_nodes FROM `quika_data`", function (err, row) {
+    if (err) {
+      res.send({ error: "MySql Query Error:" });
+      return console.log(err);
+    } else {
+      if (row.length != 1) {
+        console.log("Quika Data Row Not Found!");
+        res.send({ error: "Existing Quika Nodes not found!" });
+      } else {
+        nodes = JSON.parse(row[0].perm_nodes);
+        res.json(nodes);
+      }
+    }
+  });
+});
+
+app.get("/auth/addroleperm", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18 || !req.query.perm)
+    return res.sendStatus(404);
+  let gid = req.query.gid,
+    perms = req.query.perm;
+  connection.query(
+    "SELECT rolePermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].rolePermission
+            ? JSON.parse(row[0].rolePermission)
+            : {};
+          //if (obj.hasOwnProperty(perms[0])) return res.sendStatus(202); // Unauthorized
+          obj[perms[0]] = {};
+          obj[perms[0]].permissions = JSON.parse(perms[1]);
+          obj[perms[0]].negations = JSON.parse(perms[2]);
+          obj[perms[0]].parents = JSON.parse(perms[3]);
+          connection.query(
+            "UPDATE `servers` SET `rolePermission`='" +
+              JSON.stringify(obj) +
+              "' WHERE `ID`=" +
+              gid,
+            async function (err, row) {
+              if (err) {
+                res.sendStatus(404);
+                return console.log(err);
+              } else {
+                res.sendStatus(200);
+              }
+            }
+          );
+        }
+      }
+    }
+  );
+});
+
+app.get("/auth/getroleperm", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18 || !req.query.rid)
+    return res.sendStatus(404);
+  let gid = req.query.gid,
+    rid = req.query.rid;
+  connection.query(
+    "SELECT rolePermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].rolePermission
+              ? JSON.parse(row[0].rolePermission)
+              : {},
+            resp = {};
+          resp.hasprop = false;
+          resp.prop = {};
+          if (obj.hasOwnProperty(rid)) {
+            resp.hasprop = true;
+            resp.prop = obj[rid];
+          }
+          res.json(resp);
+        }
+      }
+    }
+  );
+});
+
+app.get("/test", cors(), function (req, res) {
   res.send("Test recieved");
 });
 
-app.get("/info", cors(), checkAuth, function(req, res) {
+app.get("/info", cors(), checkAuth, function (req, res) {
   res.json(req.user);
 });
 
@@ -229,7 +387,7 @@ function checkAuth(req, res, next) {
   res.send("User not logged in...");
 }
 
-app.listen("5000", function(err) {
+app.listen("5000", function (err) {
   if (err) return console.log(err);
   console.log("Listening at port 5000");
 });
