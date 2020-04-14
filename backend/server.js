@@ -87,20 +87,21 @@ app.get(
 );
 
 app.get("/auth/check", function (req, res) {
-  res.send(req.isAuthenticated());
+  let authed = req.isAuthenticated();
+  return res.send(authed);
 });
 
 app.get("/auth/logout", function (req, res) {
   req.logout();
-  res.send("User Logged Out!");
+  return res.send("User Logged Out!");
 });
 
 app.get("/auth/user", checkAuth, function (req, res) {
-  res.send([req.user.username, req.user.id, req.user.avatar]);
+  return res.send([req.user.username, req.user.id, req.user.avatar]);
 });
 
 app.get("/auth/guilds", checkAuth, function (req, res) {
-  res.json(req.user.guilds);
+  return res.json(req.user.guilds);
 });
 
 app.get("/auth/guildissetup", function (req, res) {
@@ -125,6 +126,24 @@ app.get("/auth/guildissetup", function (req, res) {
   });
 });
 
+app.get("/auth/guildcheck", function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) {
+    return res.status(401).send({ error: "No query found!" });
+  }
+  let gid = req.query.gid,
+    userid = req.user.id;
+  if (!quika.guilds.cache.some((u) => u.id === gid)) return res.json({code: 401});
+  if(!quika.guilds.cache.get(gid).members.cache.some((u) => u.user.id === userid)) return res.json({code:401});
+  let mem = quika.guilds.cache.get(gid).members.cache.get(userid);
+  if (mem.hasPermission("ADMINISTRATOR") || quika.guilds.cache.get(gid).ownerID === userid) {
+    let resp = {};
+    resp.id = gid;
+    resp.name = quika.guilds.cache.get(gid).name;
+    resp.icon = quika.guilds.cache.get(gid).icon;
+    return res.json(resp)
+  }
+});
+
 app.get("/auth/modules", checkAuth, function (req, res) {
   if (!req.query.id || req.query.id.length != 18) {
     return res.status(401).send({ error: "No query found" });
@@ -141,7 +160,7 @@ app.get("/auth/modules", checkAuth, function (req, res) {
         return console.log(err);
       } else {
         if (row.length != 1) {
-          res.send({ error: "No Guild Found" });
+          return res.send({ error: "No Guild Found" });
         } else {
           active = row[0].activeModules.split(", ");
           connection.query("SELECT modules FROM `quika_data`", function (
@@ -154,19 +173,22 @@ app.get("/auth/modules", checkAuth, function (req, res) {
             } else {
               if (row.length != 1) {
                 console.log("Quika Data Row Not Found!");
-                res.send({ error: "Existing Modules List not found!" });
+                return res.send({ error: "Existing Modules List not found!" });
               } else {
-                all = row[0].modules.split(", ");
+                all = Object.keys(JSON.parse(row[0].modules))
                 if (!all || all.length < 1) return;
                 if (!active || active.length < 1) return;
                 for (let i = 0; i < all.length; i++) {
+                  resp[all[i]] = {}
                   if (active.indexOf(all[i].toLowerCase()) > -1) {
-                    resp[all[i]] = true;
+                    resp[all[i]].enabled = true;
+                    resp[all[i]].desc = Object.values(JSON.parse(row[0].modules))[i]
                   } else {
-                    resp[all[i]] = false;
+                    resp[all[i]].enabled = false;
+                    resp[all[i]].desc = Object.values(JSON.parse(row[0].modules))[i]
                   }
                 }
-                res.json(resp);
+                return res.json(resp);
               }
             }
           });
@@ -191,7 +213,7 @@ app.get("/auth/setmodule", checkAuth, function (req, res) {
         return console.log(err);
       } else {
         if (row.length != 1) {
-          res.sendStatus(404);
+          return res.sendStatus(404);
         } else {
           let active = row[0].activeModules.split(", ");
           if (add) {
@@ -213,7 +235,7 @@ app.get("/auth/setmodule", checkAuth, function (req, res) {
                 res.sendStatus(404);
                 return console.log(err);
               } else {
-                res.sendStatus(200);
+                return res.sendStatus(200);
               }
             }
           );
@@ -236,10 +258,10 @@ app.get("/auth/getoverride", checkAuth, function (req, res) {
         return console.log(err);
       } else {
         if (row.length != 1) {
-          res.send({ error: "No Guild Found" });
+          return res.send({ error: "No Guild Found" });
         } else {
           let toggle = row[0].adminOverride;
-          res.json(toggle);
+          return res.json(toggle);
         }
       }
     }
@@ -257,7 +279,7 @@ app.get("/auth/setoverride", checkAuth, function (req, res) {
         res.sendStatus(404);
         return console.log(err);
       } else {
-        res.sendStatus(200);
+        return res.sendStatus(200);
       }
     }
   );
@@ -277,7 +299,7 @@ app.get("/auth/getgroles", checkAuth, function (req, res) {
       id: i,
     });
   });
-  res.json(roles);
+  return res.json(roles);
 });
 
 app.get("/auth/getnodes", checkAuth, function (req, res) {
@@ -288,10 +310,10 @@ app.get("/auth/getnodes", checkAuth, function (req, res) {
     } else {
       if (row.length != 1) {
         console.log("Quika Data Row Not Found!");
-        res.send({ error: "Existing Quika Nodes not found!" });
+        return res.send({ error: "Existing Quika Nodes not found!" });
       } else {
         nodes = JSON.parse(row[0].perm_nodes);
-        res.json(nodes);
+        return res.json(nodes);
       }
     }
   });
@@ -311,7 +333,7 @@ app.get("/auth/addroleperm", checkAuth, function (req, res) {
       } else {
         if (row.length != 1) {
           console.log("Quika Data Row Not Found!");
-          res.send({ error: "Existing Quika Nodes not found!" });
+          return res.send({ error: "Existing Quika Nodes not found!" });
         } else {
           let obj = row[0].rolePermission
             ? JSON.parse(row[0].rolePermission)
@@ -331,7 +353,7 @@ app.get("/auth/addroleperm", checkAuth, function (req, res) {
                 res.sendStatus(404);
                 return console.log(err);
               } else {
-                res.sendStatus(200);
+                return res.sendStatus(200);
               }
             }
           );
@@ -355,7 +377,7 @@ app.get("/auth/getroleperm", checkAuth, function (req, res) {
       } else {
         if (row.length != 1) {
           console.log("Quika Data Row Not Found!");
-          res.send({ error: "Existing Quika Nodes not found!" });
+          return res.send({ error: "Existing Quika Nodes not found!" });
         } else {
           let obj = row[0].rolePermission
               ? JSON.parse(row[0].rolePermission)
@@ -367,7 +389,56 @@ app.get("/auth/getroleperm", checkAuth, function (req, res) {
             resp.hasprop = true;
             resp.prop = obj[rid];
           }
-          res.json(resp);
+          return res.json(resp);
+        }
+      }
+    }
+  );
+});
+
+app.get("/auth/getroleperms", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) return res.sendStatus(404);
+  let gid = req.query.gid;
+  connection.query(
+    "SELECT rolePermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          return res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].rolePermission
+              ? JSON.parse(row[0].rolePermission)
+              : {},
+            resp = [];
+          if (Object.keys(obj).length < 1) return res.json([]);
+          for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              let rname = quika.guilds.cache.get(gid).roles.cache.get(key).name;
+              let rcolor = quika.guilds.cache.get(gid).roles.cache.get(key)
+                .color;
+              let par = [];
+              obj[key].parents.forEach((p) => {
+                let prname = quika.guilds.cache.get(gid).roles.cache.get(p)
+                  .name;
+                par.push({
+                  name: prname,
+                });
+              });
+              resp.push({
+                rid: key,
+                name: rname,
+                color: rcolor,
+                permissions: obj[key].permissions,
+                negations: obj[key].negations,
+                parents: par,
+              });
+            }
+          }
+          return res.json(resp);
         }
       }
     }
@@ -375,16 +446,16 @@ app.get("/auth/getroleperm", checkAuth, function (req, res) {
 });
 
 app.get("/test", cors(), function (req, res) {
-  res.send("Test recieved");
+  return res.send("Test recieved");
 });
 
 app.get("/info", cors(), checkAuth, function (req, res) {
-  res.json(req.user);
+  return res.json(req.user);
 });
 
 function checkAuth(req, res, next) {
   if (req.isAuthenticated()) return next();
-  res.send("User not logged in...");
+  return res.send("User not logged in...");
 }
 
 app.listen("5000", function (err) {
