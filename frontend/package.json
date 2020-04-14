@@ -21,6 +21,7 @@
     "aos": "^2.3.4",
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
+    "bootstrap-select": "^1.13.12",
     "bootstrap-switch-button-react": "^1.2.0",
     "bootstrap4-toggle": "^3.6.1",
     "jquery": "^3.4.1",

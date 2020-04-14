@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import WebsiteHandler from "./WebsiteHandler";
 import ServerHome from "./components/ServerHome";
 import ServerListing from "./components/ServerListing";
+import ServerEssential from "./components/ServerEssential";
 import NotFound from "./components/NotFound";
 
 class App extends Component {
@@ -13,6 +14,7 @@ class App extends Component {
           <Route exact path="/" component={WebsiteHandler} />
           <Route exact path="/dashboard" component={ServerListing} />
           <Route exact path="/dashboard/:guildId" component={ServerHome} />
+          <Route exact path="/dashboard/:guildId/general" component={ServerEssential} />
           <Route component={NotFound} />
         </Switch>
       </Router>

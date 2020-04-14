@@ -1,110 +1,264 @@
 #dashboardHome {
-    width: 100%;
-    height: 100% !important;
-    position: relative;
-    overflow: hidden;
-  }
+  width: 100%;
+  height: 100% !important;
+  position: relative;
+  overflow: hidden;
+}
 
 #dashboardHome .section-image {
-    text-align: center;
-    margin-top: 50px;
-    padding-top: 15px;
-    background: rgb(20, 20, 20);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+  text-align: center;
+  margin-top: 50px;
+  padding-top: 15px;
+  background: rgb(20, 20, 20);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 #dashboardHome .section-image img {
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
 }
 
-#dashboardHome .section-image h5 {
-    padding-top: 10px;
+#dashboardHome .section-image .guildName {
+  padding-top: 10px;
 }
 
-#dashboardHome .modules {
-    -webkit-box-align: center;
-    flex-direction: column;
-    align-items: center;
-    align-items: center;
-    max-width: 700px;
-    margin: auto;
-  }
-  
-  #dashboardHome .module {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    height: 60px;
-    margin-bottom: 5px;
-  }
-  
-  #dashboardHome .module:hover {
-    border-radius: 20px;
-    background-color: #0e0e0e;
-  }
-  
-  #dashboardHome .section-body {
-    align-items: center;
-    background: rgb(20, 20, 20);
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    padding-bottom: 15px;
-  }
-  
-  #dashboardHome .moduleName {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    padding: 15px;
-  }
+#dashboardHome .centeralignbox {
+  -webkit-box-align: center;
+  flex-direction: column;
+  align-items: center;
+  align-items: center;
+  max-width: 700px;
+  margin: auto;
+}
 
-  #dashboardHome .moduleName i {
-    display: inline-block;
-    border-radius: 60px;
-    box-shadow: 0px 0px 2px #888;
-    padding: 0.5em 0.6em;
-    margin-right: 10px;
-  }
-  
-  #dashboardHome .moduleToggle {
-    margin-left: auto;
-    min-width: 80px;
-    white-space: nowrap;
-  }
+#dashboardHome .modulesettings {
+  max-width: 1000px;
+}
 
-  #dashboardHome .moduleToggle .switch {
-    border-radius: 15px !important;
-  }
-  
-  #dashboardHome .dash-btn {
-    font-family: "Raleway", sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    display: inline-block;
-    padding: 8px 10px 10px 10px;
-    border-radius: 3px;
-    transition: 0.5s;
-    color: #fff;
-    background: rgba(102, 182, 109, 0.56);
-    position: relative;
-    margin: 20px 0;
-    margin-right: 10px;
-  }
-  
-  #dashboardHome .dash-btn:hover {
-    background: #66b66d;
-  }
-  
-  #dashboardHome .dash-btn i {
-    font-size: 20px;
-    position: absolute;
-    left: 18px;
-    top: 8.5px;
-  }
-  
-  #dashboardHome .dash-btn + .dash-btn {
-    margin-left: 20px;
-  }
+#dashboardHome .module {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  margin-bottom: 5px;
+}
+
+#dashboardHome .module:hover {
+  border-radius: 20px;
+  background-color: #0e0e0e;
+}
+
+#dashboardHome .section-body {
+  align-items: center;
+  background: rgb(20, 20, 20);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding-bottom: 15px;
+}
+
+#dashboardHome .section-body .pagetitle {
+  border-bottom: solid 1px #66b66d;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+#dashboardHome .section-body .pagetitle p {
+  margin-bottom: 0px !important;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+#dashboardHome .moduleName {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding: 1px 15px 0px 15px;
+}
+
+#dashboardHome .moduleDesc {
+  font-size: 13px;
+  padding-left: 15px;
+}
+
+#dashboardHome .moduleName .bx {
+  display: inline-block;
+  border-radius: 60px;
+  box-shadow: 0px 0px 2px #888;
+  padding: 0.5em 0.6em;
+  margin-right: 10px;
+}
+
+#dashboardHome .moduleToggle {
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+#dashboardHome .module .moduleNameIcon {
+  margin-right: auto;
+  cursor: pointer;
+}
+
+#dashboardHome .moduleToggle .switch {
+  border-radius: 15px !important;
+}
+
+#dashboardHome .qbtn {
+  font-family: "Raleway", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  display: inline-block;
+  padding: 8px 10px 10px 10px;
+  border-radius: 3px;
+  transition: 0.5s;
+  color: #fff;
+  background: rgba(102, 182, 109, 0.56);
+  position: relative;
+  margin: 20px 0;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+#dashboardHome .dash-btn:hover {
+  background: #66b66d;
+}
+
+#dashboardHome .dash-btn i {
+  font-size: 20px;
+  position: absolute;
+  left: 18px;
+  top: 8.5px;
+}
+
+#dashboardHome .dash-btn + .dash-btn {
+  margin-left: 20px;
+}
+
+#dashboardHome .description {
+  font-size: 13px;
+  color: #c5c8ca;
+}
+
+#dashboardHome .subtitle {
+  padding-top: 25px;
+}
+
+#dashboardHome .overrideToggle .switch {
+  border-radius: 15px !important;
+}
+
+#dashboardHome .Rolepermissions .dropdown {
+  padding: 0px;
+  padding-right: 15px;
+}
+
+#dashboardHome .Rolepermissions .dropdown-toggle,
+#dashboardHome .Rolepermissions .dropdown-toggle:focus {
+  background-color: #353535 !important;
+  color: rgb(219, 219, 219);
+  border: 0px;
+  outline: 0px !important;
+  box-shadow: 0 0 0 0 rgba(216, 217, 219, 0.5);
+}
+
+#dashboardHome .Rolepermissions .dropdown-item:hover {
+  background-color: #2c2c2c !important;
+}
+
+#dashboardHome .Rolepermissions .dropdown-item:focus {
+  border: 0px;
+  outline: 0px;
+  box-shadow: 0 0 0 0 rgba(216, 217, 219, 0.5);
+}
+
+#dashboardHome .decorated,
+#dashboardHome .dropdown-menu,
+#dashboardHome .no-results {
+  background-color: #353535 !important;
+  color: white;
+  min-width: 220px;
+}
+
+#dashboardHome .Rolepermissions input,
+#dashboardHome .Rolepermissions input:focus {
+  background-color: #353535;
+  color: white;
+  border: 0px;
+  border-bottom: solid 1px white;
+  border-radius: 0px;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.25);
+}
+
+#dashboardHome .Rolepermissions .row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+#dashboardHome .Rolepermissions span {
+  font-size: 15px;
+}
+
+#dashboardHome .Rolepermissions .dropdownRP {
+  display: none;
+}
+
+#dashboardHome .Rolepermissions .dropdown-toggle .filter-option-inner-inner {
+  text-overflow: ellipsis;
+}
+
+#dashboardHome .Rolepermissions .errormsg {
+  color: rgb(173, 0, 0);
+  display: none;
+  text-align: left;
+}
+
+#dashboardHome .Rolepermissions .viewRolePermissions {
+  padding: 20px 0px;
+}
+
+#dashboardHome .viewTable {
+  border-radius: 5px;
+}
+
+#dashboardHome .viewTable th,
+#dashboardHome .viewTable td {
+  border-width: 2px;
+  border-color: rgb(20, 20, 20);
+}
+
+#dashboardHome .viewTable tr {
+  background-color: #353535;
+}
+
+#dashboardHome .viewTable tr:nth-of-type(even) {
+  background-color: #2b2b2b;
+}
+
+/*
+REMOVE X FROM SEARCH BAR
+*/
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+/* 
+CUSTOM SCROLL FOR DROPDOWNS
+*/
+#dashboardHome .dropdown-menu .inner::-webkit-scrollbar {
+  width: 9px;
+  padding-right: 5px;
+}
+#dashboardHome .dropdown-menu .inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+#dashboardHome .dropdown-menu .inner::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(34, 34, 34, 0.815);
+}
+#dashboardHome .dropdown-menu .inner::-webkit-scrollbar-thumb:hover {
+  background: rgb(37, 37, 37);
+}
