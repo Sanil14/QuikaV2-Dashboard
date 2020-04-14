@@ -9,38 +9,27 @@ class ServerListing extends Component {
   constructor() {
     super();
     this.axios = "";
-    this.state = { user: [], guild: [], hasList: true };
+    this.state = { guild: [], hasList: true };
   }
 
   async componentDidMount() {
     this.axios = axios.create({
-      baseURL: "/"
+      baseURL: "/",
     });
-    let auth = await this.isAuthenticated();
-    if (auth) {
-      console.log("User Authenticated!");
-      let u = await this.getUserName();
-      let guilds = [];
-      let users = [];
-      users.push(u);
-      let g = await this.getGuilds();
-      for (let i = 0; i < g.length; i++) {
-        if (
-          (JSON.parse(g[i].permissions) & 0x8) === 0x8 ||
-          g[i].owner === true
-        ) {
-          let setg = await this.guildIsSetup(g[i].id.toString());
-          guilds.push([g[i].id, g[i].name, g[i].icon, setg]);
-        }
+    console.log("User Authenticated!");
+    let guilds = [];
+    let g = await this.getGuilds();
+    console.log(g);
+    for (let i = 0; i < g.length; i++) {
+      if ((JSON.parse(g[i].permissions) & 0x8) === 0x8 || g[i].owner === true) {
+        let setg = await this.guildIsSetup(g[i].id.toString());
+        guilds.push([g[i].id, g[i].name, g[i].icon, setg]);
       }
-      console.log(g)
-      if (guilds.length < 1) {
-        this.setState({ user: users, guild: guilds, hasList: false });
-      } else {
-        this.setState({ user: users, guild: guilds, hasList: true });
-      }
+    }
+    if (guilds.length < 1) {
+      this.setState({ guild: guilds, hasList: false });
     } else {
-      return (window.location.href = "/");
+      this.setState({ guild: guilds, hasList: true });
     }
   }
 
@@ -77,7 +66,7 @@ class ServerListing extends Component {
                                     g[2] +
                                     ".png"
                                   : "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png"
-                              })`
+                              })`,
                             }}
                             className="guildIcon"
                           ></div>
@@ -105,14 +94,14 @@ class ServerListing extends Component {
                       </div>
                     </div>
                   ) : (
-                    <div
-                      className="noServers" style={{textAlign: "center"}}>
+                    <div className="noServers" style={{ textAlign: "center" }}>
                       <h6>No servers were found :(</h6>
                     </div>
                   )}
                 </div>
-                <div className="helpertext" style={{textAlign: "center", fontSize: "14px", color: "#b0bac2"}}>
-                  Did not find the server you were looking for? Relog to update server list
+                <div id="helpertext">
+                  Did not find the server you were looking for? Relog to update
+                  server list
                 </div>
               </div>
             </Container>
@@ -120,16 +109,6 @@ class ServerListing extends Component {
         </SkeletonTheme>
       </div>
     );
-  }
-
-  async isAuthenticated() {
-    let { data } = await this.axios.get("/auth/check");
-    return data;
-  }
-
-  async getUserName() {
-    let { data } = await this.axios.get("/auth/user");
-    return data;
   }
 
   async getGuilds() {
@@ -140,8 +119,8 @@ class ServerListing extends Component {
   async guildIsSetup(gid) {
     let { data } = await this.axios.get("/auth/guildissetup", {
       params: {
-        id: gid
-      }
+        id: gid,
+      },
     });
     return data;
   }

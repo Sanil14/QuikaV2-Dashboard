@@ -5,58 +5,27 @@ import axios from "axios";
 import { Container } from "react-bootstrap";
 import "../css/dashboard.css";
 import ServerModules from "./ServerModules";
-import ServerGeneral from "./ServerGeneral";
+import ServerEssential from "./ServerEssential";
 
 class ServerHome extends Component {
   constructor(props) {
     super(props);
     this.guildid = this.props.match.params.guildId;
-    this.axiosinstance = "";
-    this.state = { user: [], guild: {}, module: {}, page: "modules" };
-  }
-
-  async componentDidMount() {
     this.axiosinstance = axios.create({
       baseURL: "/",
     });
-    let auth = await this.isAuthenticated();
-    if (auth) {
-      console.log("User Authenticated!");
-      if (this.guildid.length !== 18) {
-        console.log("Invalid format");
-        return this.props.history.push("/dashboard");
-      }
-      let u = await this.getUserName();
-      let guilds = {},
-        users = [],
-        counter = { s: false, u: 0 };
-      users.push(u);
-      let g = await this.getGuilds();
-      for (let i = 0; i < g.length; i++) {
-        if (
-          (JSON.parse(g[i].permissions) & 0x8) === 0x8 ||
-          g[i].owner === true
-        ) {
-          let setg = await this.guildIsSetup(g[i].id.toString());
-          if (g[i].id !== this.guildid) counter.u += 1;
-          if (setg && g[i].id === this.guildid) {
-            counter.s = true;
-            guilds["id"] = g[i].id;
-            guilds["name"] = g[i].name;
-            guilds["icon"] = g[i].icon;
-          }
-        }
-      }
-      if (counter.u === guilds.length || !counter.s) {
-        console.log("SERVER NOT FOUND");
-        return this.props.history.push("/dashboard");
-      }
-      let modules = await this.getModules(guilds.id);
-      this.setState({ user: users, guild: guilds, module: modules });
-      console.log(this.state);
-    } else {
-      return this.props.history.push("/");
+    this.state = { guild: {}, module: {}, page: "modules" };
+  }
+
+  async componentDidMount() {
+    if (this.guildid.length !== 18) {
+      console.log("Invalid format");
+      return this.props.history.push("/dashboard");
     }
+    let g = await this.guildCheck(this.guildid);
+    if (!g) return;
+    let modules = await this.getModules(g.id);
+    this.setState({ guild: g, module: modules });
   }
 
   render() {
@@ -70,29 +39,61 @@ class ServerHome extends Component {
           <section id="dashboardHome" className="d-flex align-items-center">
             <Container>
               <div className="section-image section-title">
-                <img
-                  src={`${
-                    "https://cdn.discordapp.com/icons/" +
-                    this.state.guild.id +
-                    "/" +
-                    this.state.guild.icon +
-                    ".png"
-                  }`}
-                  alt="Server Icon"
-                />
-                <h5>{this.state.guild.name}</h5>
+                {Object.keys(this.state.guild).length > 0 ? (
+                  <div>
+                    <img
+                      src={`${
+                        "https://cdn.discordapp.com/icons/" +
+                        this.state.guild.id +
+                        "/" +
+                        this.state.guild.icon +
+                        ".png"
+                      }`}
+                      alt="Server Icon"
+                      onClick={() => {
+                        if (this.state.page === "modules") return;
+                        this.changePage("modules");
+                      }}
+                    />
+                    <h5 className="guildName">{this.state.guild.name}</h5>
+                  </div>
+                ) : (
+                  <div>
+                    <Skeleton circle={true} height={100} width={100} />
+                    <br />
+                    <div className="guildName">
+                      <Skeleton height={30} width={90} />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="section-body">
+                <div
+                  className="pagetitle centeralignbox"
+                  style={{
+                    minWidth:
+                      this.state.page === "modules" ? "700px" : "1000px",
+                  }}
+                >
+                  <p>{this.state.page}</p>
+                </div>
                 {this.state.page === "modules" ? (
                   <ServerModules
                     state={this.state}
                     changePage={this.changePage}
                     moduleset={this.setModule}
                   />
-                ) : this.state.page === "general" ? (
-                  <ServerGeneral
+                ) : this.state.page === "Essentials" ? (
+                  <ServerEssential
                     state={this.state}
                     changePage={this.changePage}
+                    adminoverrideset={this.setAdminOverride}
+                    adminoverrideget={this.getAdminOverride}
+                    guildrolesget={this.getGuildRoles}
+                    nodesget={this.getPermNodes}
+                    rolepermadd={this.addRolePerm}
+                    rolepermget={this.getRolePerm}
+                    rolepermsget={this.getRolePerms}
                   />
                 ) : (
                   "WotDahlell"
@@ -106,39 +107,26 @@ class ServerHome extends Component {
   }
 
   changePage = (page) => {
-    //var state = { ...this.state };
-    //state.page = page;
-    //console.log(state);
+    console.log(page);
     this.setState({ page: page });
   };
 
-  async isAuthenticated() {
-    let { data } = await this.axiosinstance.get("/auth/check");
-    return data;
-  }
-
-  async getUserName() {
-    let { data } = await this.axiosinstance.get("/auth/user").catch((error) => {
-      return console.log(error);
-    });
-    return data;
-  }
-
-  async getGuilds() {
-    let { data } = await this.axiosinstance.get("/auth/guilds");
-    return data;
-  }
-
-  async guildIsSetup(gid) {
+  async guildCheck(gid) {
     let { data } = await this.axiosinstance
-      .get("/auth/guildissetup", {
+      .get("/auth/guildcheck", {
         params: {
-          id: gid,
+          gid: gid,
         },
       })
-      .catch((error) => {
-        return console.log(error);
+      .catch((err) => {
+        return console.log(err);
       });
+    console.log(data);
+    if (data.hasOwnProperty("code")) {
+      if (data.code === 401) {
+        return this.props.history.push("/");
+      }
+    }
     return data;
   }
 
@@ -155,11 +143,11 @@ class ServerHome extends Component {
     return data;
   }
 
-  setModule = async (module, gid, checked) => {
+  setModule = async (mod, gid, checked) => {
     let data = await this.axiosinstance
       .get("/auth/setmodule", {
         params: {
-          mod: module,
+          mod: mod.toLowerCase(),
           gid: gid,
           add: checked,
         },
@@ -167,7 +155,98 @@ class ServerHome extends Component {
       .catch((error) => {
         return error;
       });
+    let existing = JSON.parse(JSON.stringify(this.state.module));
+    existing[mod].enabled = checked;
+    this.setState({ module: existing });
     return data;
+  };
+
+  setAdminOverride = async (gid, checked) => {
+    let data = await this.axiosinstance
+      .get("/auth/setoverride", {
+        params: {
+          gid: gid,
+          toggle: checked,
+        },
+      })
+      .catch((err) => {
+        return err;
+      });
+    return data;
+  };
+
+  getAdminOverride = async (gid) => {
+    let res = await this.axiosinstance
+      .get("/auth/getoverride", {
+        params: {
+          gid: gid,
+        },
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+    return res.data;
+  };
+
+  getGuildRoles = async (gid) => {
+    let res = await this.axiosinstance
+      .get("/auth/getgroles", {
+        params: {
+          gid: gid,
+        },
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+    return res.data;
+  };
+
+  getPermNodes = async () => {
+    let res = await this.axiosinstance.get("/auth/getnodes").catch((err) => {
+      return console.log(err);
+    });
+    return res.data;
+  };
+
+  addRolePerm = async (gid, perms) => {
+    let res = await this.axiosinstance
+      .get("/auth/addroleperm", {
+        params: {
+          gid: gid,
+          perm: perms,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res;
+  };
+
+  getRolePerm = async (gid, role) => {
+    let res = await this.axiosinstance
+      .get("/auth/getroleperm", {
+        params: {
+          gid: gid,
+          rid: role,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res.data;
+  };
+
+  getRolePerms = async (gid) => {
+    let res = await this.axiosinstance
+      .get("/auth/getroleperms", {
+        params: {
+          gid: gid,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res.data;
   };
 }
 
