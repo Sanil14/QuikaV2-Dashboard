@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
-import { NavLink } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
 import Toast from "light-toast";
+import { withRouter } from "react-router-dom";
 
 class ServerModules extends Component {
   constructor(props) {
@@ -11,89 +12,60 @@ class ServerModules extends Component {
 
   render() {
     return (
-      <div className="modules">
-        <div>
-          <div className="module">
-            <NavLink to={true ? `/dashboard/` : `/invite?`}>
-              <div className="moduleName">
-                <i className="bx bxs-copy"></i>
-                <span>Essential</span>
-              </div>
-            </NavLink>
-            <div className="moduleToggle">
-              <BootstrapSwitchButton
-                checked={true}
-                onstyle="success"
-                onlabel="ON"
-                offstyle="dark"
-                offlabel="OFF"
-                disabled
-              />
-            </div>
-          </div>
-          <div
-            className="module"
-            onClick={(param) => this.updatePage("general")}
-          >
-            <a>
-              <div className="moduleName">
-                <i className="bx bx-detail"></i>
-                <span>General</span>
-              </div>
-            </a>
-            <div className="moduleToggle">
-              <BootstrapSwitchButton
-                checked={this.props.state.module.Generic}
-                onstyle="success"
-                onlabel="ON"
-                offstyle="dark"
-                offlabel="OFF"
-                onChange={async (checked) => {
-                  await this.toggleButton("generic", checked);
+      <div className="centeralignbox">
+        {Object.keys(this.props.state.module).length > 0 ? (
+          Object.keys(this.props.state.module).map((name, i) => (
+            <div className="module" key={i}>
+              <a
+                onClick={() => {
+                  if (!this.props.state.module[name].enabled && name !== "Essentials") return;
+                  this.updatePage(name);
                 }}
-              />
-            </div>
-          </div>
-          <div className="module">
-            <NavLink to={true ? `/dashboard/` : `/invite?`}>
-              <div className="moduleName">
-                <i className="bx bx-wrench"></i>
-                <span>Moderation</span>
+                className="moduleNameIcon"
+              >
+                <div className="moduleName">
+                  <span>{name}</span>
+                </div>
+                <div className="moduleDesc">
+                  <span>{this.props.state.module[name].desc}</span>
+                </div>
+              </a>
+              <div className="moduleToggle">
+                <BootstrapSwitchButton
+                  checked={
+                    name === "Essentials"
+                      ? true
+                      : this.props.state.module[name].enabled
+                  }
+                  onstyle="success"
+                  onlabel="ON"
+                  offstyle="dark"
+                  offlabel="OFF"
+                  disabled={name === "Essentials" ? true : false}
+                  onChange={async (checked) => {
+                    await this.toggleButton(name, checked);
+                  }}
+                />
               </div>
-            </NavLink>
-            <div className="moduleToggle">
-              <BootstrapSwitchButton
-                checked={this.props.state.module.Mod}
-                onstyle="success"
-                onlabel="ON"
-                offstyle="dark"
-                offlabel="OFF"
-                onChange={async (checked) => {
-                  await this.toggleButton("mod", checked);
-                }}
-              />
             </div>
-          </div>
+          ))
+        ) : (
           <div className="module">
-            <NavLink to={true ? `/dashboard/` : `/invite?`}>
+            <div className="moduleNameIcon">
               <div className="moduleName">
-                <i className="bx bx-music"></i>
-                <span>Music</span>
+                <div className="bx">
+                  <Skeleton circle={true} width={20} height={20} />
+                </div>
+                <Skeleton height={20} width={70} />
               </div>
-            </NavLink>
+            </div>
             <div className="moduleToggle">
-              <BootstrapSwitchButton
-                checked={this.props.state.module.Music}
-                onstyle="success"
-                onlabel="ON"
-                offstyle="dark"
-                offlabel="OFF"
-                onChange={async (checked) => {
-                  await this.toggleButton("music", checked);
-                }}
-              />
+              <Skeleton height={35} width={50} />
             </div>
           </div>
+        )}
+        <div id="helpertext">
+          To access the module settings, enable it first
         </div>
       </div>
     );
@@ -119,4 +91,4 @@ class ServerModules extends Component {
   }
 }
 
-export default ServerModules;
+export default withRouter(ServerModules);
