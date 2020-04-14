@@ -13,13 +13,13 @@ class NavBar extends Component {
     this.button = "";
     this.logout = "";
     this.axiosinstance = axios.create({
-      baseURL: "/"
+      baseURL: "/",
     });
   }
 
   async componentDidMount() {
     let auth = await this.isAuthenticated();
-    if (!auth) return this.button = "";
+    if (!auth) return (this.button = "");
     if (auth.data) {
       let u = await this.getUserName();
       this.setState({ user: u });
@@ -37,11 +37,13 @@ class NavBar extends Component {
             >
               <div
                 style={{
-                  backgroundImage: `url(${"https://cdn.discordapp.com/avatars/" +
+                  backgroundImage: `url(${
+                    "https://cdn.discordapp.com/avatars/" +
                     this.state.user[1] +
                     "/" +
                     this.state.user[2] +
-                    ".png"})`
+                    ".png"
+                  })`,
                 }}
                 className="avatar"
               ></div>
@@ -57,7 +59,8 @@ class NavBar extends Component {
               <Link
                 to="#"
                 className="dropdown-item logout"
-                onClick={this.logt.bind(this)}>
+                onClick={this.logt.bind(this)}
+              >
                 Logout
               </Link>
               <Link to="/invite" className="dropdown-item invite">
@@ -68,6 +71,8 @@ class NavBar extends Component {
         </li>
       );
       this.forceUpdate();
+    } else if (!auth.data && window.location.pathname !== "/") {
+      this.props.history.push("/");
     } else {
       this.button = (
         <li className="get-started" onClick={this.oauthredirect}>
@@ -131,16 +136,18 @@ class NavBar extends Component {
 
   logt() {
     console.log("Logout initiated");
-    this.axiosinstance.get("/auth/logout").then(d => {
+    Toast.loading("Logging you out...");
+    this.axiosinstance.get("/auth/logout").then((d) => {
       console.log(d.data);
-      window.location.reload();
+      Toast.success(d.data, 150);
+      this.props.history.push("/");
     });
   }
 
   async isAuthenticated() {
     let data = await this.axiosinstance
       .get("/auth/check")
-      .catch(async error => {
+      .catch(async (error) => {
         if (window.location.pathname !== "/") {
           return await this.handleError(error);
         } else {

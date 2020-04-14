@@ -1016,6 +1016,12 @@ section {
   margin-left: 20px;
 }
 
+#helpertext {
+  text-align: center;
+  font-size: 14px;
+  color: #b0bac2;
+}
+
 @media (max-width: 992px) {
   #headerdash {
     background: #0f0f0f;
