@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/logos/q_svg.svg";
+import Logo from "../assets/meme.webp";
 import { Row } from "react-bootstrap";
 import { Col } from "react-bootstrap";
 
@@ -21,7 +21,7 @@ class NotFound extends Component {
                   className="img-fluid"
                   height="256px"
                   width="256px"
-                  alt="Quika Logo"
+                  alt="Meme"
                 />
               </div>
             </Col>
