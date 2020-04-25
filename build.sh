@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. /home/ec2-user/QuikaV2-Dashboard/
+pathtoWebsite
 npm i --prefix frontend
 npm run build --prefix frontend
 npm i --prefix backend
