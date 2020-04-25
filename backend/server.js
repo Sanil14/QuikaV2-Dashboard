@@ -58,7 +58,7 @@ passport.use(
       clientID: "303533323257643020",
       clientSecret: "ChD4WBE8cvkyAs841mKjpjZwiOfUqP1x",
       callbackURL:
-        "http://ec2-13-233-216-207.ap-south-1.compute.amazonaws.com:8080/discord-callback",
+        "http://ec2-13-233-216-207.ap-south-1.compute.amazonaws.com/discord-callback",
       scope: scopes,
     },
     function (accessToken, refreshToken, profile, done) {
@@ -633,7 +633,7 @@ app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "../frontend/build", "/index.html"));
 });
 
-app.listen("8080", function (err) {
+app.listen("5000", function (err) {
   if (err) return console.log(err);
-  console.log("Listening at port 8080");
+  console.log("Listening at port 5000");
 });
