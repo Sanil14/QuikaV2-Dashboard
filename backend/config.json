@@ -1,9 +1,0 @@
-{
-    "config": {
-        "host": "quika-database.cw5dg2gal5rs.ap-south-1.rds.amazonaws.com",
-        "username": "root",
-        "password": "jKxJ5ZRI2svdzbeY1Lwp",
-        "database": "quikav2",
-        "bottoken": "MzAzNTMzMzIzMjU3NjQzMDIw.XooKvA.UV3OXrtF3JYIyXi4301XaMnlUW0"
-    }
-}

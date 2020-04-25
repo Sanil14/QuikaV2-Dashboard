@@ -2,14 +2,23 @@ const express = require("express"),
   session = require("express-session"),
   passport = require("passport"),
   mysql = require("mysql"),
-  conf = require("./config.json"),
   MySQLStore = require("connect-mysql")(session),
   { Strategy } = require("passport-discord"),
   cors = require("cors"),
   app = express(),
   fetch = require("node-fetch"),
   Discord = require("discord.js"),
-  quika = new Discord.Client();
+  quika = new Discord.Client(),
+  path = require("path"),
+  conf = {
+    config: {
+      host: "quika-database-restored.cw5dg2gal5rs.ap-south-1.rds.amazonaws.com",
+      user: "root",
+      password: "admin123",
+      database: "quikav2",
+      bottoken: "MzAzNTMzMzIzMjU3NjQzMDIw.XooKvA.UV3OXrtF3JYIyXi4301XaMnlUW0",
+    },
+  };
 
 // DISCORD BOT LOGIN AND CONFIG
 quika.on("ready", () => {
@@ -21,7 +30,7 @@ quika.login(conf.config.bottoken);
 
 var connection = mysql.createConnection({
   host: conf.config.host,
-  user: conf.config.username,
+  user: conf.config.user,
   password: conf.config.password,
   database: conf.config.database,
 });
@@ -48,7 +57,8 @@ passport.use(
     {
       clientID: "303533323257643020",
       clientSecret: "ChD4WBE8cvkyAs841mKjpjZwiOfUqP1x",
-      callbackURL: "http://localhost:5000/discord-callback",
+      callbackURL:
+        "http://ec2-13-233-216-207.ap-south-1.compute.amazonaws.com:8080/discord-callback",
       scope: scopes,
     },
     function (accessToken, refreshToken, profile, done) {
@@ -62,13 +72,17 @@ passport.use(
 app.use(
   session({
     secret: "woahthisissickwhatdoIputhere ?!?!?",
-    store: new MySQLStore(conf),
     resave: false,
     saveUninitialized: false,
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(express.static("../frontend/build"));
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "../frontend/build", "/index.html"));
+});
 
 app.get(
   "/login",
@@ -82,7 +96,7 @@ app.get(
   cors(),
   passport.authenticate("discord", { failureRedirect: "/" }),
   function (req, res) {
-    res.redirect("http://localhost:3000/dashboard");
+    res.redirect("./dashboard");
   }
 );
 
@@ -132,15 +146,22 @@ app.get("/auth/guildcheck", function (req, res) {
   }
   let gid = req.query.gid,
     userid = req.user.id;
-  if (!quika.guilds.cache.some((u) => u.id === gid)) return res.json({code: 401});
-  if(!quika.guilds.cache.get(gid).members.cache.some((u) => u.user.id === userid)) return res.json({code:401});
+  if (!quika.guilds.cache.some((u) => u.id === gid))
+    return res.json({ code: 401 });
+  if (
+    !quika.guilds.cache.get(gid).members.cache.some((u) => u.user.id === userid)
+  )
+    return res.json({ code: 401 });
   let mem = quika.guilds.cache.get(gid).members.cache.get(userid);
-  if (mem.hasPermission("ADMINISTRATOR") || quika.guilds.cache.get(gid).ownerID === userid) {
+  if (
+    mem.hasPermission("ADMINISTRATOR") ||
+    quika.guilds.cache.get(gid).ownerID === userid
+  ) {
     let resp = {};
     resp.id = gid;
     resp.name = quika.guilds.cache.get(gid).name;
     resp.icon = quika.guilds.cache.get(gid).icon;
-    return res.json(resp)
+    return res.json(resp);
   }
 });
 
@@ -175,17 +196,21 @@ app.get("/auth/modules", checkAuth, function (req, res) {
                 console.log("Quika Data Row Not Found!");
                 return res.send({ error: "Existing Modules List not found!" });
               } else {
-                all = Object.keys(JSON.parse(row[0].modules))
+                all = Object.keys(JSON.parse(row[0].modules));
                 if (!all || all.length < 1) return;
                 if (!active || active.length < 1) return;
                 for (let i = 0; i < all.length; i++) {
-                  resp[all[i]] = {}
+                  resp[all[i]] = {};
                   if (active.indexOf(all[i].toLowerCase()) > -1) {
                     resp[all[i]].enabled = true;
-                    resp[all[i]].desc = Object.values(JSON.parse(row[0].modules))[i]
+                    resp[all[i]].desc = Object.values(
+                      JSON.parse(row[0].modules)
+                    )[i];
                   } else {
                     resp[all[i]].enabled = false;
-                    resp[all[i]].desc = Object.values(JSON.parse(row[0].modules))[i]
+                    resp[all[i]].desc = Object.values(
+                      JSON.parse(row[0].modules)
+                    )[i];
                   }
                 }
                 return res.json(resp);
@@ -319,6 +344,23 @@ app.get("/auth/getnodes", checkAuth, function (req, res) {
   });
 });
 
+app.get("/auth/getusers", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) return res.sendStatus(404);
+  let gid = req.query.gid;
+  if (!quika.guilds.cache.some((u) => u.id === gid)) return res.sendStatus(404);
+  let users = [];
+  quika.guilds.cache.get(gid).members.cache.map((r, i) => {
+    if (r.id === quika.guilds.cache.get(gid).ownerID) return;
+    users.push({
+      name: r.user.username,
+      discrim: r.user.discriminator,
+      color: r.displayHexColor,
+      id: i,
+    });
+  });
+  return res.json(users);
+});
+
 app.get("/auth/addroleperm", checkAuth, function (req, res) {
   if (!req.query.gid || req.query.gid.length != 18 || !req.query.perm)
     return res.sendStatus(404);
@@ -445,6 +487,135 @@ app.get("/auth/getroleperms", checkAuth, function (req, res) {
   );
 });
 
+app.get("/auth/adduserperm", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18 || !req.query.perm)
+    return res.sendStatus(404);
+  let gid = req.query.gid,
+    perms = req.query.perm;
+  connection.query(
+    "SELECT userPermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          return res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].userPermission
+            ? JSON.parse(row[0].userPermission)
+            : {};
+          obj[perms[0]] = {};
+          obj[perms[0]].permissions = JSON.parse(perms[1]);
+          obj[perms[0]].negations = JSON.parse(perms[2]);
+          obj[perms[0]].parents = JSON.parse(perms[3]);
+          connection.query(
+            "UPDATE `servers` SET `userPermission`='" +
+              JSON.stringify(obj) +
+              "' WHERE `ID`=" +
+              gid,
+            async function (err, row) {
+              if (err) {
+                res.sendStatus(404);
+                return console.log(err);
+              } else {
+                return res.sendStatus(200);
+              }
+            }
+          );
+        }
+      }
+    }
+  );
+});
+
+app.get("/auth/getuserperm", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18 || !req.query.uid)
+    return res.sendStatus(404);
+  let gid = req.query.gid,
+    uid = req.query.uid;
+  connection.query(
+    "SELECT userPermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          return res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].userPermission
+              ? JSON.parse(row[0].userPermission)
+              : {},
+            resp = {};
+          resp.hasprop = false;
+          resp.prop = {};
+          if (obj.hasOwnProperty(uid)) {
+            resp.hasprop = true;
+            resp.prop = obj[uid];
+          }
+          return res.json(resp);
+        }
+      }
+    }
+  );
+});
+
+app.get("/auth/getuserperms", checkAuth, function (req, res) {
+  if (!req.query.gid || req.query.gid.length != 18) return res.sendStatus(404);
+  let gid = req.query.gid;
+  connection.query(
+    "SELECT userPermission FROM `servers` WHERE `ID`=" + gid,
+    function (err, row) {
+      if (err) {
+        res.send({ error: "MySql Query Error:" });
+        return console.log(err);
+      } else {
+        if (row.length != 1) {
+          console.log("Quika Data Row Not Found!");
+          return res.send({ error: "Existing Quika Nodes not found!" });
+        } else {
+          let obj = row[0].userPermission
+              ? JSON.parse(row[0].userPermission)
+              : {},
+            resp = [];
+          if (Object.keys(obj).length < 1) return res.json([]);
+          for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              let uname = quika.guilds.cache.get(gid).members.cache.get(key)
+                .user.username;
+              let discrim = quika.guilds.cache.get(gid).members.cache.get(key)
+                .user.discriminator;
+              let color = quika.guilds.cache.get(gid).members.cache.get(key)
+                .displayHexColor;
+              let par = [];
+              obj[key].parents.forEach((p) => {
+                let prname = quika.guilds.cache.get(gid).roles.cache.get(p)
+                  .name;
+                par.push({
+                  name: prname,
+                });
+              });
+              resp.push({
+                uid: key,
+                name: uname,
+                discrim: discrim,
+                color: color,
+                permissions: obj[key].permissions,
+                negations: obj[key].negations,
+                parents: par,
+              });
+            }
+          }
+          return res.json(resp);
+        }
+      }
+    }
+  );
+});
+
 app.get("/test", cors(), function (req, res) {
   return res.send("Test recieved");
 });
@@ -458,7 +629,11 @@ function checkAuth(req, res, next) {
   return res.send("User not logged in...");
 }
 
-app.listen("5000", function (err) {
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "../frontend/build", "/index.html"));
+});
+
+app.listen("8080", function (err) {
   if (err) return console.log(err);
-  console.log("Listening at port 5000");
+  console.log("Listening at port 8080");
 });
