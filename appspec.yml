@@ -2,12 +2,8 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/QuikaV2-Dashboard
+    destination: /home/ec2-user/QuikaV2-Dashboard
 hooks:
-#  BeforeInstall:
-#    - location: scripts/install_dependencies.sh
-#      timeout: 300
-#      runas: root
   AfterInstall:
     - location: build.sh
       timeout: 600
