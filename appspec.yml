@@ -17,6 +17,6 @@ hooks:
       timeout: 60
       runas: root
 permissions:
-- object: /
+  - object: /
     pattern: '*.sh'
     mode: 777
