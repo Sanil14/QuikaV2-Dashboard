@@ -58,7 +58,7 @@ passport.use(
       clientID: "303533323257643020",
       clientSecret: "ChD4WBE8cvkyAs841mKjpjZwiOfUqP1x",
       callbackURL:
-        "http://ec2-13-233-216-207.ap-south-1.compute.amazonaws.com/discord-callback",
+        "http://quikabot.com/discord-callback",
       scope: scopes,
     },
     function (accessToken, refreshToken, profile, done) {
