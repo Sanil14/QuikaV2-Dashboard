@@ -13,7 +13,7 @@ files:
       timeout: 600
       runas: root
   ApplicationStart:
-    - location: post-build.sh
+    - location: postBuild.sh
       timeout: 300
       runas: root
 #  ApplicationStop:
