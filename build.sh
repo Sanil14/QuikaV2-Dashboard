@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
-source ./frontend
+source frontend
+npm i
 npm run build
+source backend
+npm i
 
