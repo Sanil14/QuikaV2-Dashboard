@@ -2,5 +2,5 @@
 
 npm i --prefix frontend
 npm run build --prefix frontend
-npm i --prefix frontend
+npm i --prefix backend
 
