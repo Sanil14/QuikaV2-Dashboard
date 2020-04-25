@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 source frontend
-"$(which npm)" i
-"$(which npm)" run build
+npm i
+npm run build
 source backend
-"$(which npm)" i
+npm i
 
