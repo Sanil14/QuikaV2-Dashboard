@@ -19,6 +19,10 @@
   width: 100px;
   height: 100px;
   cursor: pointer;
+  /* box-shadow */
+ -webkit-box-shadow: rgba(39, 39, 39, 0.911) 0 0 10px;
+ -moz-box-shadow: rgba(39, 39, 39, 0.911) 0 0 10px;
+ box-shadow: rgba(39, 39, 39, 0.911) 0 0 10px;
 }
 
 #dashboardHome .section-image .guildName {
@@ -148,13 +152,13 @@
   border-radius: 15px !important;
 }
 
-#dashboardHome .Rolepermissions .dropdown {
+#dashboardHome .permissions .dropdown {
   padding: 0px;
   padding-right: 15px;
 }
 
-#dashboardHome .Rolepermissions .dropdown-toggle,
-#dashboardHome .Rolepermissions .dropdown-toggle:focus {
+#dashboardHome .permissions .dropdown-toggle,
+#dashboardHome .permissions .dropdown-toggle:focus {
   background-color: #353535 !important;
   color: rgb(219, 219, 219);
   border: 0px;
@@ -162,11 +166,11 @@
   box-shadow: 0 0 0 0 rgba(216, 217, 219, 0.5);
 }
 
-#dashboardHome .Rolepermissions .dropdown-item:hover {
+#dashboardHome .permissions .dropdown-item:hover {
   background-color: #2c2c2c !important;
 }
 
-#dashboardHome .Rolepermissions .dropdown-item:focus {
+#dashboardHome .permissions .dropdown-item:focus {
   border: 0px;
   outline: 0px;
   box-shadow: 0 0 0 0 rgba(216, 217, 219, 0.5);
@@ -180,8 +184,8 @@
   min-width: 220px;
 }
 
-#dashboardHome .Rolepermissions input,
-#dashboardHome .Rolepermissions input:focus {
+#dashboardHome .permissions input,
+#dashboardHome .permissions input:focus {
   background-color: #353535;
   color: white;
   border: 0px;
@@ -190,30 +194,30 @@
   box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.25);
 }
 
-#dashboardHome .Rolepermissions .row {
+#dashboardHome .permissions .row {
   margin-left: 0px;
   margin-right: 0px;
 }
 
-#dashboardHome .Rolepermissions span {
+#dashboardHome .permissions span {
   font-size: 15px;
 }
 
-#dashboardHome .Rolepermissions .dropdownRP {
+#dashboardHome .permissions .dropdownRP {
   display: none;
 }
 
-#dashboardHome .Rolepermissions .dropdown-toggle .filter-option-inner-inner {
+#dashboardHome .permissions .dropdown-toggle .filter-option-inner-inner {
   text-overflow: ellipsis;
 }
 
-#dashboardHome .Rolepermissions .errormsg {
+#dashboardHome .permissions .errormsg {
   color: rgb(173, 0, 0);
   display: none;
   text-align: left;
 }
 
-#dashboardHome .Rolepermissions .viewRolePermissions {
+#dashboardHome .permissions .viewpermissions {
   padding: 20px 0px;
 }
 

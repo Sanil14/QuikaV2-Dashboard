@@ -89,11 +89,15 @@ class ServerHome extends Component {
                     changePage={this.changePage}
                     adminoverrideset={this.setAdminOverride}
                     adminoverrideget={this.getAdminOverride}
-                    guildrolesget={this.getGuildRoles}
-                    nodesget={this.getPermNodes}
-                    rolepermadd={this.addRolePerm}
-                    rolepermget={this.getRolePerm}
-                    rolepermsget={this.getRolePerms}
+                    guildrolesget={this.getGuildRoles} // get all server roles
+                    nodesget={this.getPermNodes} // get all permission nodes
+                    usersget={this.getUsers}
+                    rolepermadd={this.addRolePerm} // set role permissions
+                    rolepermget={this.getRolePerm} // get single role perm node values
+                    rolepermsget={this.getRolePerms} // get all role perm nodes
+                    userpermadd={this.addUserPerm} // set user permissions
+                    userpermget={this.getUserPerm} // get single perm node values
+                    userpermsget={this.getUserPerms} // get all perm nodes
                   />
                 ) : (
                   "WotDahlell"
@@ -208,6 +212,17 @@ class ServerHome extends Component {
     return res.data;
   };
 
+  getUsers = async (gid) => {
+    let res = await this.axiosinstance.get("/auth/getusers", {
+      params: {
+        gid: gid,
+      }
+    }).catch((err) => {
+      return console.log(err);
+    });
+    return res.data;
+  }
+
   addRolePerm = async (gid, perms) => {
     let res = await this.axiosinstance
       .get("/auth/addroleperm", {
@@ -241,6 +256,47 @@ class ServerHome extends Component {
       .get("/auth/getroleperms", {
         params: {
           gid: gid,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res.data;
+  };
+
+  addUserPerm = async (gid, perms) => {
+    let res = await this.axiosinstance
+      .get("/auth/adduserperm", {
+        params: {
+          gid: gid,
+          perm: perms,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res;
+  };
+
+  getUserPerm = async (gid, uid) => {
+    let res = await this.axiosinstance
+      .get("/auth/getuserperm", {
+        params: {
+          gid: gid,
+          uid: uid
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return res.data;
+  };
+
+  getUserPerms = async (gid) => {
+    let res = await this.axiosinstance
+      .get("/auth/getuserperms", {
+        params: {
+          gid: gid
         },
       })
       .catch((err) => {

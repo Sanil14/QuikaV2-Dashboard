@@ -131,7 +131,7 @@ class NavBar extends Component {
   }
 
   oauthredirect = () => {
-    window.location.href = "http://localhost:5000/login";
+    window.location.href = "./login";
   };
 
   logt() {
