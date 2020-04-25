@@ -3,7 +3,7 @@ os: linux
 files:
   - source: /
     destination: /home/QuikaV2-Dashboard
-#hooks:
+hooks:
 #  BeforeInstall:
 #    - location: scripts/install_dependencies.sh
 #      timeout: 300
