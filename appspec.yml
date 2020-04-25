@@ -4,6 +4,10 @@ files:
   - source: /
     destination: /home/ec2-user/QuikaV2-Dashboard
 hooks:
+  BeforeInstall:
+    - location: preBuild.sh
+      timeout: 300
+      runas: root
   AfterInstall:
     - location: build.sh
       timeout: 600
@@ -12,7 +16,7 @@ hooks:
     - location: postBuild.sh
       timeout: 60
       runas: root
-#  ApplicationStop:
-#    - location: scripts/stop_server.sh
-#      timeout: 300
-#      runas: root
+permissions:
+- object: /
+    pattern: '*.sh'
+    mode: 777
