@@ -183,7 +183,7 @@ app.get("/auth/modules", checkAuth, function (req, res) {
         if (row.length != 1) {
           return res.send({ error: "No Guild Found" });
         } else {
-          active = row[0].activeModules.split(", ");
+          active = JSON.parse(row[0].activeModules);
           connection.query("SELECT modules FROM `quika_data`", function (
             err,
             row
@@ -240,7 +240,7 @@ app.get("/auth/setmodule", checkAuth, function (req, res) {
         if (row.length != 1) {
           return res.sendStatus(404);
         } else {
-          let active = row[0].activeModules.split(", ");
+          let active = JSON.parse(row[0].activeModules);
           if (add) {
             if (active.indexOf(module) > -1) return res.sendStatus(200);
             active.push(module);
@@ -249,7 +249,7 @@ app.get("/auth/setmodule", checkAuth, function (req, res) {
             if (active.indexOf(module) <= -1) return res.sendStatus(200);
             active.splice(active.indexOf(module), 1);
           }
-          let modules = active.join(", ");
+          let modules = JSON.stringify(active);
           connection.query(
             "UPDATE `servers` SET `activeModules`='" +
               modules +
