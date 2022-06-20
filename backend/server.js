@@ -12,11 +12,11 @@ const express = require("express"),
   path = require("path"),
   conf = {
     config: {
-      host: "quika-database-restored.cw5dg2gal5rs.ap-south-1.rds.amazonaws.com",
-      user: "root",
-      password: "admin123",
-      database: "quikav2",
-      bottoken: "MzAzNTMzMzIzMjU3NjQzMDIw.XooKvA.UV3OXrtF3JYIyXi4301XaMnlUW0",
+      host: process.env.HOST,
+      user: process.env.USERNAME,
+      password: process.env.PASSWORD,
+      database: process.env.DATABASE,
+      bottoken: process.env.BOT_TOKEN,
     },
   };
 
